@@ -17,9 +17,12 @@ async function httpGetContent(req, res) {
 async function httpUpdateContent(req, res) {
   try {
     const { content } = req.body;
+    console.log(req.body)
     if (!content) {
+      console.log("try 3")
       return res.status(400).json({ error: "Content is required" });
     }
+    console.log("try 2")
     const updatedDocument = await updateContent(content);
     return res.status(200).json(updatedDocument);
   } catch (err) {

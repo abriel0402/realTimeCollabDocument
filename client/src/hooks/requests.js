@@ -7,8 +7,12 @@ export async function httpGetContent() {
 }
 
 export async function httpUpdateContent(newContent) {
+    console.log(newContent)
   return await fetch(`${API_URL}/api/update-content`, {
     method: "put",
+    headers: {
+        "Content-Type": "application/json",
+      },
     body: JSON.stringify(newContent),
   });
 }
