@@ -12,7 +12,7 @@ async function getContent() {
 }
 
 async function updateContent(newContent) {
-    console.log("update content called")
+   // console.log("update content called")
     const document = await documents.findOne();
     if (document) {
       document.content = newContent;

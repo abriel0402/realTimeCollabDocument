@@ -8,9 +8,16 @@ const MONGO_URL =
 
 const app = require("./app.js");
 const server = http.createServer(app);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
+const sockets = require("./sockets.js");
 mongoose.connection.once("open", () => {
-  console.log("mongo db connection ready");
+  //console.log("mongo db connection ready");
 });
 
 mongoose.connection.on("error", (err) => {
@@ -20,9 +27,11 @@ mongoose.connection.on("error", (err) => {
 async function startServer() {
   await mongoose.connect(MONGO_URL);
 
-  server.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}`);
-  });
+  server.listen(PORT)
+  sockets.listen(io);
+
 }
+
+
 
 startServer();
