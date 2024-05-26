@@ -1,7 +1,6 @@
 function listen(io) {
   console.log("test");
   io.on("connection", (socket) => {
-
     console.log("user connected");
     console.log(socket.id);
 
@@ -10,7 +9,7 @@ function listen(io) {
     });
 
     console.log(socket);
-    
+
     socket.on("disconnect", () => {
       console.log("a client disconnected");
     });
