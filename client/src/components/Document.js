@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { httpGetContent, httpUpdateContent } from "../hooks/requests";
 import io from "socket.io-client";
 
@@ -6,6 +6,8 @@ const socket = io("http://localhost:8000");
 
 const Document = () => {
   const [content, setContent] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const typingTimeoutRef = useRef(null);
 
   const getContent = useCallback(async () => {
     const fetchedContent = await httpGetContent();
@@ -20,7 +22,9 @@ const Document = () => {
     socket.on("connect", () => {});
 
     socket.on("content update from server", (newContent) => {
-      setContent(newContent);
+      if (!isTyping) {
+        setContent(newContent);
+      }
     });
 
     socket.on("disconnect", () => {
@@ -28,42 +32,46 @@ const Document = () => {
     });
 
     return () => {
-      //unmount socket
+      
       socket.off("content update from server");
       socket.off("connect");
       socket.off("disconnect");
     };
-  }, []);
+  }, [isTyping]);
 
   const handleChange = (e) => {
     setContent(e.target.value);
+    setIsTyping(true);
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false);
+      updateContent(e.target.value);
+    }, 300); // debounc
+
+    socket.emit("content update", e.target.value); 
   };
 
-  const updateContent = useCallback(async () => {
-    await httpUpdateContent({ content });
-    socket.emit("content update", content);
-  }, [content]);
+  const updateContent = useCallback(async (newContent) => {
+    await httpUpdateContent({ content: newContent });
+  }, []);
 
-  useEffect(() => {
-    const updateTimeout = setTimeout(() => {
-      updateContent();
-    }, 850); // debounce, basically waits for user to stop typing for x ms, then updates for other users
-
-    return () => clearTimeout(updateTimeout);
-  }, [content, updateContent]);
-
+  // tab functionality
   const handleKeyDown = (e) => {
     if (e.key === "Tab") {
       e.preventDefault();
       const start = e.target.selectionStart;
       const end = e.target.selectionEnd;
-      const spaces = "    "; // tab
+      const spaces = "    ";
       const newValue =
         content.substring(0, start) + spaces + content.substring(end);
       setContent(newValue);
 
       setTimeout(() => {
-        // moves cursor after
+        
         e.target.selectionStart = e.target.selectionEnd = start + spaces.length;
       }, 0);
     }
@@ -115,7 +123,7 @@ const styles = {
   },
   editorContainer: {
     backgroundColor: "#ffffff",
-    width: "816px", // keep at 816 to match google docs default width
+    width: "816px", // Keep at 816 to match Google Docs default width
     marginTop: "20px",
     padding: "20px",
     boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
