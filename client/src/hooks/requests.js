@@ -1,7 +1,13 @@
 const API_URL = "http://localhost:8000";
 
-export async function httpGetContent() {
-  const response = await fetch(`${API_URL}/api/get-content`);
+export async function httpGetContent(code) {
+  const response = await fetch(`${API_URL}/api/get-content`, {
+    method: "get",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(code),
+  });
 
   return await response.json();
 }

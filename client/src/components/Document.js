@@ -4,18 +4,20 @@ import io from "socket.io-client";
 
 const socket = io("http://localhost:8000");
 
-const Document = () => {
+const Document = ({document}) => {
   const [content, setContent] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef(null);
+  const [code, setCode] = useState("");
 
   const getContent = useCallback(async () => {
     const fetchedContent = await httpGetContent();
     setContent(fetchedContent.content);
+    setCode(fetchedContent.code);
   }, []);
 
   useEffect(() => {
-    getContent();
+    getContent(document.code);
   }, [getContent]);
 
   useEffect(() => {
@@ -32,7 +34,6 @@ const Document = () => {
     });
 
     return () => {
-      
       socket.off("content update from server");
       socket.off("connect");
       socket.off("disconnect");
@@ -52,7 +53,7 @@ const Document = () => {
       updateContent(e.target.value);
     }, 300); // debounc
 
-    socket.emit("content update", e.target.value); 
+    socket.emit("content update", e.target.value);
   };
 
   const updateContent = useCallback(async (newContent) => {
@@ -71,7 +72,6 @@ const Document = () => {
       setContent(newValue);
 
       setTimeout(() => {
-        
         e.target.selectionStart = e.target.selectionEnd = start + spaces.length;
       }, 0);
     }
@@ -84,13 +84,16 @@ const Document = () => {
           Real Time Collaboration Document Editor
         </h2>
       </div>
+      <div>
+        <h2>{code}</h2>
+      </div>
       <div style={styles.editorContainer}>
         <textarea
           value={content}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           style={styles.editor}
-          placeholder="Start typing your document..."
+          placeholder="Start typing..."
         />
       </div>
     </div>

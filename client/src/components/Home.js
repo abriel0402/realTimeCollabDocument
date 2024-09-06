@@ -1,14 +1,14 @@
-import React, { useState,useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import Info from "./Info";
 import { httpCreateDocument } from "../hooks/requests";
-
+import Document from "./Document";
 const Home = ({ switchToInfo, switchToEnterCode }) => {
   const [username, setUsername] = useState("");
-  const [document, setDocument] = useState()
+  const [document, setDocument] = useState();
 
   const handleMouseOver = (e) => {
     e.target.style.backgroundColor = "#333333";
-  }; 
+  };
 
   const handleMouseOverCenter = (e) => {
     e.target.style.backgroundColor = "#F7F7F7";
@@ -26,13 +26,13 @@ const Home = ({ switchToInfo, switchToEnterCode }) => {
     setUsername(e.target.value);
   };
 
-
-  
-    const createDocument = useCallback(async () => {
-      const fetchedDocument = await httpCreateDocument();
-      // setDocument(fetchedDocument);
-    }, []);
-
+  const createDocument = useCallback(async () => {
+    const fetchedDocument = await httpCreateDocument();
+    setDocument(fetchedDocument);
+  }, []);
+  if (document) {
+    return <Document document={document} />;
+  }
   return (
     <div style={styles.documentContainer}>
       <div style={styles.toolbar}>
@@ -57,7 +57,7 @@ const Home = ({ switchToInfo, switchToEnterCode }) => {
             onMouseOut={handleMouseOut}
             onClick={createDocument}
           >
-            Start New Document
+            Create New Document
           </button>
           <button
             style={{ ...styles.button, ...styles.centerButton }}

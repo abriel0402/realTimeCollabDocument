@@ -34,7 +34,7 @@ const ALPHABET = [
 
 function genCode() {
   let code = ""
-  for(let i=0; i < 4; i++){
+  for(let i=0; i < 6; i++){
     num = Math.floor(Math.random()*26) 
     code += ALPHABET[num]
   }
@@ -43,8 +43,8 @@ function genCode() {
 }
 
 
-async function getContent() {
-  const document = await documents.findOne();
+async function getContent(code) {
+  const document = await documents.findBy({code: code});
   if (!document) {
     return document.save({ content: " " });
   }
@@ -64,9 +64,11 @@ async function updateContent(newContent) {
   return document;
 }
 
+
+
 async function createDocument() {
-  const document = new Document({ content: "", code: genCode() });
-  await document.save()
+  const document = new documents({ content: " ", code: genCode() });
+  document.save()
   return document
 }
 
@@ -74,4 +76,5 @@ module.exports = {
   getContent,
   updateContent,
   createDocument,
+  
 };

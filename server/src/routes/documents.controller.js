@@ -5,7 +5,8 @@ const { createDocument } = require("../models/documents.model.js");
 async function httpGetContent(req, res) {
   //console.log("Http get content called");
   try {
-    const documentContent = await getContent();
+    const { code } = req.body
+    const documentContent = await getContent(code);
     //  console.log("got content");
     return res.status(200).json(documentContent);
   } catch (err) {
@@ -35,6 +36,7 @@ async function httpUpdateContent(req, res) {
 async function httpCreateDocument(req, res) {
   try {
     const document = await createDocument();
+    console.log(document);
     return res.status(201).json(document);
   } catch (err) {
     console.error(err);

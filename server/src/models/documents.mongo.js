@@ -3,7 +3,10 @@ const mongoose = require("mongoose");
 const documentsSchema = new mongoose.Schema({
   content: {
     type: String,
-    code: String,
+    required: true,
+  },
+  code: {
+    type: String,
     required: true,
   },
 });
